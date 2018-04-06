@@ -101,12 +101,13 @@ def serialHandler(ser, command):
     dataCounter = 0
     while True:
         rawData = serialPort(ser, command)
-        if dataCounter == 1000:
+        if dataCounter == 10:
             fileWriter(handle_data(rawData, dataCounter))
             dataCounter = 0
             break
         else:
             dataCounter += 1
+            print("data counter = %d", dataCounter)
         time.sleep(.2)
 
 
@@ -143,10 +144,10 @@ def AOUT(ser, cmd):
 
 
 GPIO.add_event_detect(buttonPin, GPIO.FALLING, callback=button_press, bouncetime=300)
+ser = init_port(port, baud)
+dataThread = threading.Thread(target=serialHandler, args=(ser, "DATA\r"))
+dataThread.start()
 
 while True:
-    ser = init_port(port, baud)
-    dataThread = threading.Thread(target=serialHandler, args=(ser, "DATA\r"))
-    dataThread.start()
     print("test in progress...")
     time.sleep(5)
