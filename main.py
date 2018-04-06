@@ -131,6 +131,13 @@ def serialHandler(ser, command):
                 dataCounter += 1
             time.sleep(.2)
 
+
+
+def serialPort(ser, cmd):
+	
+
+
+
 def serialCMD(ser, command):
     ser.flush()
     ser.write(command)
