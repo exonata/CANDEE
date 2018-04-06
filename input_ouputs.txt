@@ -1,0 +1,52 @@
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//Date last modified: 3/28/18                                                                                            ~~
+//Original  Author: Cory Bowdach                                                                                         ~~
+//Last Author: Cory Bowdach                                                                                              ~~
+//                                                                                                                       ~~
+//Description: Messge out values to host                                                                                 ~~
+//Command: DATA                                                                                                          ~~
+//Parameter 0: none                                                                                                      ~~
+//Parameter 1: none                                                                                                      ~~
+//Parameter 2: none                                                                                                      ~~
+//Parameter 3: none                                                                                                      ~~
+//                                                                                                                       ~~
+//Notes: 1: DINPUTS: has room for 8 inputs                                                                               ~~
+//       2: AOUTPUTS: list which outputs are on                                                                          ~~
+//       3: AINPUTS: has the analog inputs in volts                                                                      ~~
+//       4: AOUTPUTS: list the voltage for the analog output/s  in volts                                                 ~~
+//                                                                                                                       ~~
+//Example: 'DATA' + {cr} //return MCU data                                                                               ~~
+//Output to RS232:TIME:         25|DINPUTS:       000000000|DOUTPUTS:     00000000|AINPUTS:       0.114359 0.322344 0.525421 0.327180|AOUTPUTS:   0.000000|*         ~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//Date last modified: 3/28/18                                                                                            ~~
+//Original  Author: Cory Bowdach                                                                                         ~~
+//Last Author: Cory Bowdach                                                                                              ~~
+//                                                                                                                       ~~
+//Description: Modify one of the digital outputvalues                                                                    ~~
+//Command: DOUT                                                                                                          ~~
+//Parameter 0: output to modify                                                                                          ~~
+//Parameter 1: value to modify it to. 0 = OFF, 1 = ON, 2 = toggle                                                        ~~
+//Parameter 2: none                                                                                                      ~~
+//Parameter 3: none                                                                                                      ~~
+//                                                                                                                       ~~
+//Example: 'DOUT 1 0' + {cr}     //turn off relay1                                                                       ~~
+//Example: 'DOUT 0 2' + {cr}     //toggle relay0                                                                         ~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//Date last modified: 3/28/18                                                                                            ~~
+//Original  Author: Cory Bowdach                                                                                         ~~
+//Last Author: Cory Bowdach                                                                                              ~~
+//                                                                                                                       ~~
+//Description: Modify one of the analog output values                                                                    ~~
+//Command: AOUT                                                                                                          ~~
+//Parameter 0: output to modify                                                                                          ~~
+//Parameter 1: value to write in volts                                                                                   ~~
+//Parameter 2: none                                                                                                      ~~
+//Parameter 3: none                                                                                                      ~~
+//                                                                                                                       ~~
+//Example: 'AOUT 0 0' + {cr}     //write 0V to analog out 0                                                              ~~
+//Example: 'AOUT 0 2.5' + {cr}   //write 0V to analog out 0                                                              ~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
