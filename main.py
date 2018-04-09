@@ -31,7 +31,7 @@ baud = 115200
 # file setup
 filelocation = "/logs/"
 filename = filelocation + "testfile_" + str(time.time()) + ".csv"
-fileheader = "Time, DIN1 , DIN2, DIN3, DIN4,DIN5,DIN6,DIN7,DIN8,DOUT0,DOUT1,DOUT2,DOUT3, AIN0, AIN0,AIN0,AIN0,AOUT0,AOUT0,AOUT0,AOUT0"
+fileheader = "Time, DIN1 , DIN2, DIN3, DIN4,DIN5,DIN6,DIN7,DIN8,DOUT0,DOUT1,DOUT2,DOUT3, AIN0, AIN1,AIN2,AIN3,AOUT0,AOUT1,AOUT2,AOUT3\r"
 
 
 # pin definitions
@@ -81,21 +81,24 @@ def fileWriter(time, dinputs, douputs, ainput, aoutputs, filename):
 
 #raw data handler
 def handle_data(raw_data, dataCounter):
-    TIME = []
-    DINPUTS = []
-    DOUTPUTS = []
-    AINPUTS = []
-    AOUTPUTS = []
-    data = []
-    print(raw_data)
-    for i in range(raw_data):
-        data[i] = raw_data.split('|')
-        TIME[:][i] = data[0].split("\t")
-        DINPUTS[:][i] = data[1].split("\t")
-        DOUTPUTS[:][i] = data[2].split("\t")
-        AINPUTS[:][i] = data[3].split("\t")
-        AOUTPUTS[:][i] = data[4].split("\t")
-    return {TIME, DINPUTS,  DOUTPUTS, AINPUTS, AOUTPUTS}
+    TIME = ""
+    DINPUTS = ""
+    DOUTPUTS = ""
+    AINPUTS = ""
+    AOUTPUTS = ""
+    data = ""
+    print(TIMcE)
+    print(DINPUTS)
+    for i in range(len(raw_data)):
+        data.insert(i,raw_data[i].split('|'))
+	print(data)
+	print(data[0])
+        TIME.insert(data[0][0].split("\t"))
+        DINPUTS[i].append(data[1].split("\t"))
+        DOUTPUTS[i].append(data[2].split("\t"))
+        AINPUTS[i].append(data[3].split("\t"))
+        AOUTPUTS[i].append(data[4].split("\t"))
+    return TIME, DINPUTS,  DOUTPUTS, AINPUTS, AOUTPUTS
 
     # set up thread generators
 def serialHandler(ser, command):
@@ -103,15 +106,19 @@ def serialHandler(ser, command):
     rawData = []
     data = {}
     while True:
-        rawData[dataCounter] = serialPort(ser, command)
-        if dataCounter == 10:
+	print("data counter %d", dataCounter)
+
+	dataDebug = serialPort(ser, command)
+	print(dataDebug)
+        rawData.append(dataDebug)
+        if dataCounter == 2:
             data = handle_data(rawData, dataCounter)
             fileWriter(data)
             dataCounter = 0
             break
         else:
             dataCounter += 1
-            print("data counter = %d", dataCounter)
+            print("data counter = %s" % dataCounter)
         time.sleep(.2)
 
 
@@ -119,24 +126,24 @@ def serialPort(ser, cmd):
     ser.open()
     if ser.isOpen():
         print("in the reading of serial")
-        try:
-            reading = []
-            ser.flush()
-            ser.write(cmd)
-            print("wrote to serial")
-            for c in ser.read():
-                if c == '*':
-                    ser.close()
-                    break
-                else:
-                    reading.append(c)
-            rawData = ''.join(reading)
-        except:
-            rawData = "Error in serial command"
-            print("Error in serial command")
+        reading = []
+        ser.flush()
+        ser.write(cmd)
+        print("wrote to serial")
+        rawData = ser.readline()
+        print(rawData)
+#            for c in ser.read():
+#		print(c)
+#                if c == '*':
+#                    ser.close()
+#                    break
+#                else:
+#                    reading.append(c)
+#            rawData = ''.join(reading)
+        ser.close()
     else:
         rawData = "error in serial command"
-    ser.close()
+	ser.close()
     return rawData
 
 
