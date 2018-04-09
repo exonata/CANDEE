@@ -86,9 +86,10 @@ def handle_data(raw_data, dataCounter):
     DOUTPUTS = []
     AINPUTS = []
     AOUTPUTS = []
+    data = []
     print(raw_data)
-    for i in range(dataCounter):
-        data = raw_data.split('|')
+    for i in range(raw_data):
+        data[i] = raw_data.split('|')
         TIME[:][i] = data[0].split("\t")
         DINPUTS[:][i] = data[1].split("\t")
         DOUTPUTS[:][i] = data[2].split("\t")
@@ -99,10 +100,13 @@ def handle_data(raw_data, dataCounter):
     # set up thread generators
 def serialHandler(ser, command):
     dataCounter = 0
+    rawData = []
+    data = {}
     while True:
-        rawData = serialPort(ser, command)
+        rawData[dataCounter] = serialPort(ser, command)
         if dataCounter == 10:
-            fileWriter(handle_data(rawData, dataCounter))
+            data = handle_data(rawData, dataCounter)
+            fileWriter(data)
             dataCounter = 0
             break
         else:
@@ -112,11 +116,14 @@ def serialHandler(ser, command):
 
 
 def serialPort(ser, cmd):
+    ser.open()
     if ser.isOpen():
+        print("in the reading of serial")
         try:
             reading = []
             ser.flush()
             ser.write(cmd)
+            print("wrote to serial")
             for c in ser.read():
                 if c == '*':
                     ser.close()
@@ -129,6 +136,7 @@ def serialPort(ser, cmd):
             print("Error in serial command")
     else:
         rawData = "error in serial command"
+    ser.close()
     return rawData
 
 
@@ -145,6 +153,7 @@ def AOUT(ser, cmd):
 
 GPIO.add_event_detect(buttonPin, GPIO.FALLING, callback=button_press, bouncetime=300)
 ser = init_port(port, baud)
+ser.close()
 dataThread = threading.Thread(target=serialHandler, args=(ser, "DATA\r"))
 dataThread.start()
 
