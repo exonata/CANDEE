@@ -51,10 +51,9 @@ def init_port(port, baud):
 
 # initiate file and add header
 def init_logFile(filename, fileheader):
-    f = open('testfile.csv', 'wt')
+    f = open('testfile.csv', 'w')
     try:
-        writer = csv.writer(f)
-        writer.writerow( ('Time','DIN1','DIN2','DIN3','DIN4','DIN5','DIN6','DIN7','DIN8','DOUT0','DOUT1','DOUT2') )
+        f.write(fileheader)
     finally:
         f.close()
     return f
@@ -65,73 +64,55 @@ def button_press(channel):
 
 
 # file writer for data out
-def fileWriter(time, dinputs, douputs, ainput, aoutputs, filename):
-    rows = len(time)
-    file = open('testfile.csv', 'wt')
-    writer = csv.writer(file, quoting=csv.QUOTE_ALL)
-    outputData = list(zip(time, dinputs, douputs, ainput, aoutputs))
-#    print(outputData)
-
+def fileWriter(outputData):
+    file = open('testfile.csv', 'a')
     try:
-        # for i in range(rows):
-        writer.writerows(outputData)
-        # print([time[i], dinputs[i], douputs[i], ainput[i], aoutputs[i]])
+        file.write(outputData)
     finally:
         file.close()
 
 
 #raw data handler
 def handle_data(raw_data):
-    TIME = []
-    DINPUTS = []
-    DOUTPUTS = []
-    AINPUTS = []
-    AOUTPUTS = []
-
-    for i in range(len(raw_data)):
-        data = raw_data[i].split('|')
-        TIME.append(data[0].split("\t"))
-        DINPUTS.append(data[1].split("\t"))
-        DOUTPUTS.append(data[2].split("\t"))
-        AINPUTS.append(data[3].split("\t"))
-        AOUTPUTS.append(data[4].split("\t"))
-    output = TIME[1] + "," + DINPUTS[1] + "," + AINPUTS[1]+ AINPUTS[1]
-
-    print(TIME) 
-    return TIME, DINPUTS,  DOUTPUTS, AINPUTS, AOUTPUTS
+    data = raw_data.split('|')
+    print(data)
+    TIME = (data[0].split("\t"))
+    DINPUTS = data[1].split("\t")
+    DOUTPUTS = data[2].split("\t")
+    AINPUTS = data[3].split("\t")
+    AINPUTS = AINPUTS[1].split(" ")
+    AOUTPUTS = data[4].split("\t")
+    print(AINPUTS)
+    output = TIME[1] + "," + DINPUTS[1] + "," + DOUTPUTS[1] + "," + AINPUTS[0] + "," + AINPUTS[1] + "," + AINPUTS[2] + "," + AINPUTS[3] + ","  + AOUTPUTS[1] + "\n"
+    return output
 
 
-    # set up thread generators
-def serialHandler(ser, command):
+# set up thread generators
+def dataCollection(ser, command):
     dataCounter = 0
-    rawData = []
+    outputString = ""
     while True:
-	dataDebug = serialPort(ser, command)
-	print(dataDebug)
-        rawData.append(dataDebug)
+        dataDebug = serialPort(ser, command)
+#        print(dataDebug)
+        rawData = handle_data(dataDebug)
+        outputString = outputString + rawData
         if dataCounter == 2:
-	    a, b, c, d, e = handle_data(rawData)
-	    fileWriter(a, b, c, d, e, "testfile.csv")
-            dataCounter = 0
-	    rawData[:] = []
+            fileWriter(outputString)
+            outputString = ""
+            rawData[:] = []
         else:
             dataCounter += 1
-            print("data counter = %s" % dataCounter)
         time.sleep(.2)
 
-
+# the only access function to the serial port
 def serialPort(ser, cmd):
     ser.open()
     if ser.isOpen():
-        print("in the reading of serial")
-        reading = []
         ser.flush()
         ser.write(cmd)
-        print("wrote to serial")
         rawData = ser.readline()
-        print(rawData)
 #            for c in ser.read():
-#		print(c)
+#		        print(c)
 #                if c == '*':
 #                    ser.close()
 #                    break
@@ -141,7 +122,7 @@ def serialPort(ser, cmd):
         ser.close()
     else:
         rawData = "error in serial command"
-	ser.close()
+        ser.close()
     return rawData
 
 
@@ -159,7 +140,7 @@ def AOUT(ser, cmd):
 GPIO.add_event_detect(buttonPin, GPIO.FALLING, callback=button_press, bouncetime=300)
 ser = init_port(port, baud)
 ser.close()
-dataThread = threading.Thread(target=serialHandler, args=(ser, "DATA\r"))
+dataThread = threading.Thread(target=dataCollection(), args=(ser, "DATA\r"))
 dataThread.start()
 
 while True:
