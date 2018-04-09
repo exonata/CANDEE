@@ -97,18 +97,18 @@ def handle_data(raw_data):
         AOUTPUTS.append(data[4].split("\t"))
     return TIME, DINPUTS,  DOUTPUTS, AINPUTS, AOUTPUTS
 
+
     # set up thread generators
 def serialHandler(ser, command):
     dataCounter = 0
     rawData = []
-    data = {}
     while True:
-	print("data counter %d", dataCounter)
 	dataDebug = serialPort(ser, command)
 	print(dataDebug)
         rawData.append(dataDebug)
         if dataCounter == 2:
-            fileWriter(handle_data(rawData))
+	    a, b, c, d, e = handle_data(rawData)
+	    fileWriter(a, b, c, d, e, "testfile.csv")
             dataCounter = 0
             break
         else:
