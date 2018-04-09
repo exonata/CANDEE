@@ -31,7 +31,7 @@ baud = 115200
 # file setup
 filelocation = "/logs/"
 filename = filelocation + "testfile_" + str(time.time()) + ".csv"
-fileheader = "Time, DIN1 , DIN2, DIN3, DIN4,DIN5,DIN6,DIN7,DIN8,DOUT0,DOUT1,DOUT2,DOUT3, AIN0, AIN1,AIN2,AIN3,AOUT0,AOUT1,AOUT2,AOUT3\r"
+fileheader = "Time, DIN1 , DIN2, DIN3, DIN4,DIN5,DIN6,DIN7,DIN8,DOUT0,DOUT1,DOUT2,DOUT3, AIN0, AIN1,AIN2,AIN3,AOUT0,AOUT1,AOUT2,AOUT3"
 
 
 # pin definitions
@@ -51,9 +51,13 @@ def init_port(port, baud):
 
 # initiate file and add header
 def init_logFile(filename, fileheader):
-    with open('filename', 'wb') as myfile:
-        wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-        wr.writerow(fileheader)
+    f = open('testfile.csv', 'wt')
+    try:
+        writer = csv.writer(f)
+        writer.writerow( ('Time','DIN1','DIN2','DIN3','DIN4','DIN5','DIN6','DIN7','DIN8','DOUT0','DOUT1','DOUT2') )
+    finally:
+        f.close()
+    return f
 
 #button press
 def button_press(channel):
@@ -62,42 +66,35 @@ def button_press(channel):
 
 # file writer for data out
 def fileWriter(time, dinputs, douputs, ainput, aoutputs, filename):
-    #dataWrite = []
     rows = len(time)
-    for i in range(rows):
-        print([time[i], dinputs[i], douputs[i], ainput[i], aoutputs[i]])
-    # rows = len(time)
-    # col_time = 1
-    # col_dinputs = 8
-    # col_doutputs = 4
-    # col_ainputs = 4
-    # col_aouputs = 4
-    # for i in range(rows):
-    #     dataWrite[i][0:col_time] = time[i]
-    #     dataWrite[i][col_time:col_dinputs+col_time] = din
-    #     # with open(filename, wb) as csv_file:
-    #     # csv.writer(csv_file).writerow([for i in range time:])
+    file = open('testfile.csv', 'wt')
+    writer = csv.writer(file, quoting=csv.QUOTE_ALL)
+    outputData = list(zip(time, dinputs, douputs, ainput, aoutputs))
+    print(outputData)
+
+    try:
+        # for i in range(rows):
+        writer.writerows(outputData)
+        # print([time[i], dinputs[i], douputs[i], ainput[i], aoutputs[i]])
+    finally:
+        file.close()
 
 
 #raw data handler
-def handle_data(raw_data, dataCounter):
-    TIME = ""
-    DINPUTS = ""
-    DOUTPUTS = ""
-    AINPUTS = ""
-    AOUTPUTS = ""
-    data = ""
-    print(TIMcE)
-    print(DINPUTS)
+def handle_data(raw_data):
+    TIME = []
+    DINPUTS = []
+    DOUTPUTS = []
+    AINPUTS = []
+    AOUTPUTS = []
+
     for i in range(len(raw_data)):
-        data.insert(i,raw_data[i].split('|'))
-	print(data)
-	print(data[0])
-        TIME.insert(data[0][0].split("\t"))
-        DINPUTS[i].append(data[1].split("\t"))
-        DOUTPUTS[i].append(data[2].split("\t"))
-        AINPUTS[i].append(data[3].split("\t"))
-        AOUTPUTS[i].append(data[4].split("\t"))
+        data = raw_data[i].split('|')
+        TIME.append(data[0].split("\t"))
+        DINPUTS.append(data[1].split("\t"))
+        DOUTPUTS.append(data[2].split("\t"))
+        AINPUTS.append(data[3].split("\t"))
+        AOUTPUTS.append(data[4].split("\t"))
     return TIME, DINPUTS,  DOUTPUTS, AINPUTS, AOUTPUTS
 
     # set up thread generators
@@ -107,13 +104,11 @@ def serialHandler(ser, command):
     data = {}
     while True:
 	print("data counter %d", dataCounter)
-
 	dataDebug = serialPort(ser, command)
 	print(dataDebug)
         rawData.append(dataDebug)
         if dataCounter == 2:
-            data = handle_data(rawData, dataCounter)
-            fileWriter(data)
+            fileWriter(handle_data(rawData))
             dataCounter = 0
             break
         else:
