@@ -93,13 +93,13 @@ def dataCollection(ser, command):
     outputString = ""
     while True:
         dataDebug = serialPort(ser, command)
-#        print(dataDebug)
+#       print(dataDebug)
         rawData = handle_data(dataDebug)
         outputString = outputString + rawData
         if dataCounter == 2:
             fileWriter(outputString)
             outputString = ""
-            rawData[:] = []
+            rawData = ""
         else:
             dataCounter += 1
         time.sleep(.2)
@@ -140,7 +140,7 @@ def AOUT(ser, cmd):
 GPIO.add_event_detect(buttonPin, GPIO.FALLING, callback=button_press, bouncetime=300)
 ser = init_port(port, baud)
 ser.close()
-dataThread = threading.Thread(target=dataCollection(), args=(ser, "DATA\r"))
+dataThread = threading.Thread(target=dataCollection, args=(ser, "DATA\r"))
 dataThread.start()
 
 while True:
