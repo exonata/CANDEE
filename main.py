@@ -70,7 +70,7 @@ def fileWriter(time, dinputs, douputs, ainput, aoutputs, filename):
     file = open('testfile.csv', 'wt')
     writer = csv.writer(file, quoting=csv.QUOTE_ALL)
     outputData = list(zip(time, dinputs, douputs, ainput, aoutputs))
-    print(outputData)
+#    print(outputData)
 
     try:
         # for i in range(rows):
@@ -95,6 +95,9 @@ def handle_data(raw_data):
         DOUTPUTS.append(data[2].split("\t"))
         AINPUTS.append(data[3].split("\t"))
         AOUTPUTS.append(data[4].split("\t"))
+    output = TIME[1] + "," + DINPUTS[1] + "," + AINPUTS[1]+ AINPUTS[1]
+
+    print(TIME) 
     return TIME, DINPUTS,  DOUTPUTS, AINPUTS, AOUTPUTS
 
 
@@ -110,7 +113,7 @@ def serialHandler(ser, command):
 	    a, b, c, d, e = handle_data(rawData)
 	    fileWriter(a, b, c, d, e, "testfile.csv")
             dataCounter = 0
-            break
+	    rawData[:] = []
         else:
             dataCounter += 1
             print("data counter = %s" % dataCounter)
