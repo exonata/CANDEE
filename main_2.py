@@ -32,16 +32,17 @@ def global_define():
     BAUD = 115200
     global FILEHEAD, FILELOC, FILENAME
     # file setup
-    FILELOC = "/logs/"
-    FILENAME = filelocation + "testfile_" + time.strftime("%Y%m%d-%H%M%S") + ".csv"
+    FILELOC = "logs/"
+    FILENAME = FILELOC + "testfile_" + time.strftime("%Y%m%d-%H%M%S") + ".csv"
     FILEHEAD = "Time,DIN1,DIN2,DIN3,DIN4,DIN5,DIN6,DIN7,DIN8,DOUT0,DOUT1,DOUT2,DOUT3,AIN0, AIN1,AIN2,AIN3,AOUT0,AOUT1,AOUT2,AOUT3"
     global BUTTON_0
     # pin definitions
     BUTTON_0 = 4
 
+global_define()
 # pin setup
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(BUTTON, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # button pin set as input w/ pullup resistor
+GPIO.setup(BUTTON_0, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # button pin set as input w/ pullup resistor
 
 #main function
 #def main(port, baud, filename):
@@ -61,6 +62,7 @@ def initLogFile(filename, fileheader):
     f = open(filename, 'w')
     try:
         f.write(fileheader)
+	print(filename)
     except Exception as e:
         print("Could not init log file error: ")
     finally:
@@ -76,7 +78,9 @@ def buttonPress(channel):
 # file writer for data out
 def fileWriter(outputData):
     file = open(FILENAME, 'a')
+    print(FILENAME)
     try:
+	print("Writing to file")
         file.write(outputData)
     except Exception as e:
         print("Could not init log file error: ")
@@ -106,21 +110,22 @@ def dataCollection(ser, command):
         rawData = serialTransmission(ser, command)
         parsedData = parseData(rawData)
         outputString = outputString + parsedData
-        if dataCounter == 1000:
+        if dataCounter == 100:
             fileWriter(outputString)
             outputString = ""
         else:
             dataCounter += 1
-        time.sleep(.2)
+        time.sleep(.05)
 
 # the only access function to the serial port
 def serialTransmission(ser, cmd):
-    serialLock.aquire()
+    serialLock.acquire()
     try:
         ser.open()
         ser.flush()
         ser.write(cmd)
         rawData = ser.readline()
+	print(rawData)
     except SerialException:
         rawData = "Unable to open serial port"
         print(SerialException)
@@ -188,8 +193,7 @@ def AOUT(analogOutput, cmd):
 
     return error_code
 
-
-GPIO.add_event_detect(BUTTON_0, GPIO.FALLING, callback=buttonPress, bouncetime=300)
+GPIO.add_event_detect(4, GPIO.FALLING, callback=buttonPress, bouncetime=300)
 ser = initPort(PORT, BAUD)
 ser.close()
 dataThread = threading.Thread(target=dataCollection, args=(ser, "DATA\r"))
